@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -38,5 +40,5 @@ public class User extends AudiTableLong {
     private Boolean isActive;
 
     @OneToMany(fetch = FetchType.LAZY)
-    private Booking booking;
+    private List<Booking> booking;
 }
