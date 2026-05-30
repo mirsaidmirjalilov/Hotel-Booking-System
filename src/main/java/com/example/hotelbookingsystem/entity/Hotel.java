@@ -35,11 +35,9 @@ public class Hotel extends AudiTableLong {
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id",nullable = false)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "hotel")
     private List<Room> rooms;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id",nullable = false)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "hotel")
     private List<Review> reviews;
 }

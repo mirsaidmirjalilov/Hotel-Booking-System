@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Room extends AudiTableLong {
-    @Column(name = "room_type",nullable = false,unique = true)
+    @Column(name = "room_type",nullable = false)
     private String roomType;
 
     @Column(name = "description",nullable = false)
@@ -42,11 +42,13 @@ public class Room extends AudiTableLong {
     @ColumnDefault(value = "true")
     private Boolean isActive;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_inventory_id",nullable = false)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "room")
     private List<RoomInventory> roomInventory;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id",nullable = false)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "room")
     private List<Booking> booking;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hotel_id")
+    private Hotel hotel;
 }

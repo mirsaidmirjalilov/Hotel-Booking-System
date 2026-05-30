@@ -31,4 +31,8 @@ public class Payment extends AudiTableLong {
 
     @Column(name = "paid_at",nullable = false)
     private LocalDateTime paidAt;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
 }

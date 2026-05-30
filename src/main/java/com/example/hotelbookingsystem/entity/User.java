@@ -39,6 +39,9 @@ public class User extends AudiTableLong {
     @ColumnDefault(value = "true")
     private Boolean isActive;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     private List<Booking> booking;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Hotel> hotels;
 }

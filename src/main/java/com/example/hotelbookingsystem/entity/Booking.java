@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
 @Builder
 public class Booking extends AudiTableLong {
     @Column(name = "check_in",nullable = false)
-    private Integer checkIn;
+    private LocalDateTime checkIn;
 
     @Column(name = "check_out",nullable = false)
-    private Integer checkOut;
+    private LocalDateTime checkOut;
 
     @Column(name = "total_guests",nullable = false)
     @Positive
@@ -45,4 +45,18 @@ public class Booking extends AudiTableLong {
 
     @Column(name = "cancelled_at")
     private LocalDateTime cancelledAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private Room room;
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    private Payment payment;
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    private Review review;
 }

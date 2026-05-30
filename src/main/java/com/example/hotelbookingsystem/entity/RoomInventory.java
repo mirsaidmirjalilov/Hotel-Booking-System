@@ -1,9 +1,7 @@
 package com.example.hotelbookingsystem.entity;
 
 import com.example.hotelbookingsystem.entity.base.AudiTableLong;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -21,4 +19,8 @@ public class RoomInventory extends AudiTableLong {
 
     @Column(name = "available_rooms",nullable = false)
     private Integer availableRooms;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private Room room;
 }
