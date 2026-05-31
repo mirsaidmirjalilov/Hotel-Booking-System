@@ -1,0 +1,89 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-hotels-table
+      author: mirsaid
+      changes:
+        - createTable:
+            tableName: hotels
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: hotel_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: city
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: address
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: phone_number
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_hotel_user
+                    references: users(id)
+
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_by
+                  type: varchar(255)
+
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+
+        # Optional: Add index for better performance
+        - createIndex:
+            indexName: idx_hotel_city
+            tableName: hotels
+            columns:
+              - column:
+                  name: city
+
+        - createIndex:
+            indexName: idx_hotel_user
+            tableName: hotels
+            columns:
+              - column:
+                  name: user_id

@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-bookings-table
+      author: mirsaid
+      changes:
+        - createTable:
+            tableName: bookings
+            columns:
+              # Columns inherited from AudiTableLong (Assumed structure)
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+
+              # Booking entity columns
+              - column:
+                  name: check_in
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: check_out
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_guests
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_price
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: booking_status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: payment_status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: booked_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cancelled_at
+                  type: TIMESTAMP
+              - column:
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: room_id
+                  type: BIGINT
+
+        # Foreign Key Constraints
+        - addForeignKeyConstraint:
+            baseTableName: bookings
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_bookings_user
+            onDelete: SET NULL
+
+        - addForeignKeyConstraint:
+            baseTableName: bookings
+            baseColumnNames: room_id
+            referencedTableName: rooms
+            referencedColumnNames: id
+            constraintName: fk_bookings_room
+            onDelete: SET NULL

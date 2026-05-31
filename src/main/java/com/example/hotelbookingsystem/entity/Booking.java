@@ -4,6 +4,7 @@ import com.example.hotelbookingsystem.entity.base.AudiTableLong;
 import com.example.hotelbookingsystem.enums.BookingStatus;
 import com.example.hotelbookingsystem.enums.PaymentStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 public class Booking extends AudiTableLong {
     @Column(name = "check_in",nullable = false)
+    @Future
     private LocalDateTime checkIn;
 
     @Column(name = "check_out",nullable = false)

@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-room-inventories-table
+      author: mirsaid
+      changes:
+        - createTable:
+            tableName: room_inventories
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: date
+                  type: date
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: available_rooms
+                  type: int
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: room_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_room_inventory_room
+                    references: rooms(id)
+
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_by
+                  type: varchar(255)
+
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+
+        # Important: Unique constraint to prevent duplicate inventory per day per room
+        - addUniqueConstraint:
+            tableName: room_inventories
+            columnNames: room_id, date
+            constraintName: uk_room_inventory_date
+
+        # Index for fast lookups
+        - createIndex:
+            indexName: idx_room_inventory_room_date
+            tableName: room_inventories
+            columns:
+              - column:
+                  name: room_id
+              - column:
+                  name: date
+
+        - createIndex:
+            indexName: idx_room_inventory_date
+            tableName: room_inventories
+            columns:
+              - column:
+                  name: date

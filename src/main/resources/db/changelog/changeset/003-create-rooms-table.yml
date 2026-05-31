@@ -1,0 +1,121 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-rooms-table
+      author: mirsaid
+      changes:
+        - createTable:
+            tableName: rooms
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: room_type
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: capacity
+                  type: int
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: base_price
+                  type: decimal(10,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: total_rooms
+                  type: int
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: is_active
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: hotel_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_room_hotel
+                    references: hotels(id)
+
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_by
+                  type: varchar(255)
+
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+
+        # Index for better performance
+        - createIndex:
+            indexName: idx_room_hotel
+            tableName: rooms
+            columns:
+              - column:
+                  name: hotel_id
+
+        - createIndex:
+            indexName: idx_room_type
+            tableName: rooms
+            columns:
+              - column:
+                  name: room_type
+
+  # Separate table for imageUrls @ElementCollection
+  - changeSet:
+      id: 003.1-create-room-image-urls-table
+      author: mirsaid
+      changes:
+        - createTable:
+            tableName: room_image_urls
+            columns:
+              - column:
+                  name: room_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_room_image_room
+                    references: rooms(id)
+
+              - column:
+                  name: image_url
+                  type: varchar(500)
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: room_image_urls
+            columnNames: room_id, image_url

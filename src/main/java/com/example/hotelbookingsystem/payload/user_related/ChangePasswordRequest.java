@@ -1,0 +1,13 @@
+package com.example.hotelbookingsystem.payload.user_related;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record ChangePasswordRequest(
+        @NotNull String oldPassword,
+        @NotNull String newPassword
+) {
+}

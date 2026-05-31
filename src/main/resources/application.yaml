@@ -1,3 +1,26 @@
 spring:
   application:
     name: Hotel Booking System
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+
+  datasource:
+      url: jdbc:postgresql://localhost:5432/postgres
+      username: postgres
+      password: 123
+      driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    change-log: classpath:db/changelog/changeset/changelog-master.yml
+
+springdoc:
+  swagger-ui:
+      path: /swagger-ui.html
+jwt:
+  secret: h5EZlzbaBmZLL8NWf3M5assLtlIymAa3GbwyPd7oZpJ
+  expiration: 86400 # 24 hours in seconds
