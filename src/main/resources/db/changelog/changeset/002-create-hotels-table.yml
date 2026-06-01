@@ -46,6 +46,13 @@ databaseChangeLog:
                     unique: true
 
               - column:
+                  name: is_active
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+              - column:
                   name: user_id
                   type: bigint
                   constraints:

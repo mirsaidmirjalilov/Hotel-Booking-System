@@ -8,6 +8,7 @@ import com.example.hotelbookingsystem.payload.auth_related.RegisterRequest;
 import com.example.hotelbookingsystem.repository.UserRepository;
 import com.example.hotelbookingsystem.security.JwtTokenUtil;
 import com.example.hotelbookingsystem.service.AuthService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
 
     @Override
+    @Transactional
     public AuthResponse login(LoginRequest loginRequest) {
         String email = loginRequest.email();
         String password = loginRequest.password();
@@ -32,11 +34,12 @@ public class AuthServiceImpl implements AuthService {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         authenticationManager.authenticate(authenticationToken);
         String token = jwtTokenUtil.generateToken(email);
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return new AuthResponse("logged in", token, userMapper.mapToUserResponse(user));
     }
 
     @Override
+    @Transactional
     public AuthResponse register(RegisterRequest registerRequest) {
         User user = User.builder()
                 .role(registerRequest.role())

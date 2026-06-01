@@ -23,4 +23,4 @@ springdoc:
       path: /swagger-ui.html
 jwt:
   secret: h5EZlzbaBmZLL8NWf3M5assLtlIymAa3GbwyPd7oZpJ
-  expiration: 86400 # 24 hours in seconds
+  expiration: 86400000 # 24 hours in milliseconds

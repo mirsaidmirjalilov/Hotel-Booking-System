@@ -4,6 +4,7 @@ import com.example.hotelbookingsystem.entity.base.AudiTableLong;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.List;
 
@@ -30,6 +31,10 @@ public class Hotel extends AudiTableLong {
     @Column(name = "phone_number",nullable = false,unique = true)
     @Pattern(regexp = "^\\+998(9[01345789])\\d{7}$")
     private String phoneNumber;
+
+    @Column(name = "is_active",nullable = false)
+    @ColumnDefault(value = "true")
+    private boolean isActive;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",nullable = false)

@@ -42,6 +42,6 @@ public class User extends AudiTableLong {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     private List<Booking> booking;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     private List<Hotel> hotels;
 }
