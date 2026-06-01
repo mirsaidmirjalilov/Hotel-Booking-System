@@ -5,7 +5,6 @@ import com.example.hotelbookingsystem.payload.hotel_related.HotelRequest;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelResponse;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelUpdateRequest;
 import com.example.hotelbookingsystem.service.HotelService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

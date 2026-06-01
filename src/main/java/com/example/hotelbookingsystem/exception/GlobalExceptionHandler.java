@@ -27,4 +27,10 @@ public class GlobalExceptionHandler {
         ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 404);
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(RoleNotSuitException.class)
+    public ResponseEntity<ErrorResponse> handleRoleNotSuitException(RoleNotSuitException ex, WebRequest request) {
+        ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 400);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -2,11 +2,12 @@ package com.example.hotelbookingsystem.service.impl;
 
 import com.example.hotelbookingsystem.entity.Hotel;
 import com.example.hotelbookingsystem.entity.User;
+import com.example.hotelbookingsystem.enums.Role;
 import com.example.hotelbookingsystem.exception.HotelNotFoundException;
+import com.example.hotelbookingsystem.exception.RoleNotSuitException;
 import com.example.hotelbookingsystem.exception.UserNotFoundException;
 import com.example.hotelbookingsystem.mapper.HotelMapper;
 import com.example.hotelbookingsystem.mapper.UserMapper;
-import com.example.hotelbookingsystem.payload.BaseResponse;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelRequest;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelResponse;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelUpdateRequest;
@@ -32,19 +33,22 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")
     public HotelResponse createHotel(Long managerId, HotelRequest request) {
-        User user = userRepository.findById(managerId).orElseThrow(() -> new UserNotFoundException("user with " + managerId + " not found"));
+        User user = userRepository.findById(managerId).orElseThrow(() -> new UserNotFoundException("user with id: " + managerId + ", not found"));
+
+        if (user.getRole() != Role.MANAGER) {
+            throw new RoleNotSuitException("user with id: " + user.getId() + " doesn't have appropriate role for this");
+        }
 
         Hotel hotel = Hotel.builder()
                 .hotelName(request.hotelName())
                 .description(request.description())
-                .city(request.city())
                 .user(user)
                 .phoneNumber(request.phoneNumber())
                 .city(request.city())
                 .address(request.address())
-                .description(request.description())
+                .isActive(true)
                 .build();
         hotelRepository.save(hotel);
 
@@ -52,7 +56,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @Transactional
     public HotelResponse updateHotel(Long hotelId, Long managerId, HotelUpdateRequest request) {
         Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException("hotel with " + hotelId + " not found"));
@@ -84,7 +88,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('MANAGER')")
     public List<HotelResponse> getMyHotels(Long managerId) {
         User user = userRepository.findById(managerId).orElseThrow(() -> new UserNotFoundException("user with " + managerId + " not found"));
 
