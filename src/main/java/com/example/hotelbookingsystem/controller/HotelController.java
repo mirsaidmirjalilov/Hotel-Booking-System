@@ -1,10 +1,12 @@
 package com.example.hotelbookingsystem.controller;
 
 import com.example.hotelbookingsystem.payload.BaseResponse;
-import com.example.hotelbookingsystem.payload.hotel_related.HotelRequest;
+import com.example.hotelbookingsystem.payload.hotel_related.HotelCreateRequest;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelResponse;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelUpdateRequest;
+import com.example.hotelbookingsystem.payload.room_related.RoomResponse;
 import com.example.hotelbookingsystem.service.HotelService;
+import com.example.hotelbookingsystem.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +22,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HotelController {
     private final HotelService hotelService;
+    private final RoomService roomService;
 
     @PostMapping("/{managerId}/create")
-    public ResponseEntity<BaseResponse<HotelResponse>> createHotel(@PathVariable Long managerId, @RequestBody HotelRequest hotelRequest) {
-        HotelResponse hotel = hotelService.createHotel(managerId, hotelRequest);
+    public ResponseEntity<BaseResponse<HotelResponse>> createHotel(@PathVariable Long managerId, @RequestBody HotelCreateRequest hotelCreateRequest) {
+        HotelResponse hotel = hotelService.createHotel(managerId, hotelCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.ok(hotel));
     }
@@ -62,5 +65,14 @@ public class HotelController {
     ) {
         Page<HotelResponse> hotelResponses = hotelService.searchHotels(city, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(hotelResponses));
+    }
+
+    @GetMapping("/{hotelId}/rooms")
+    public ResponseEntity<BaseResponse<List<RoomResponse>>> getRoomsByHotel(
+            @PathVariable Long hotelId
+    ) {
+        List<RoomResponse> roomsByHotel = roomService.getRoomsByHotel(hotelId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(roomsByHotel));
     }
 }

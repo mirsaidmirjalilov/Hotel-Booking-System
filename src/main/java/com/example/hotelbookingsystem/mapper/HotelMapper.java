@@ -9,7 +9,7 @@ import java.util.Collections;
 
 @Component
 public class HotelMapper {
-    public HotelResponse toHotelResponse(Hotel hotel, UserResponse userResponse) {
+    public HotelResponse toHotelResponse(Hotel hotel) {
         return new HotelResponse(
                 hotel.getId(),
                 hotel.getHotelName(),
@@ -17,9 +17,7 @@ public class HotelMapper {
                 hotel.getCity(),
                 hotel.getAddress(),
                 hotel.getPhoneNumber(),
-                userResponse,
-                Collections.emptyList(),
-                Collections.emptyList()
+                hotel.getUser().getId()
         );
     }
 }

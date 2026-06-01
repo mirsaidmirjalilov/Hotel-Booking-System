@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record HotelRequest(
+public record HotelCreateRequest(
     @NotNull String hotelName,
     String description,
     @NotNull String city,

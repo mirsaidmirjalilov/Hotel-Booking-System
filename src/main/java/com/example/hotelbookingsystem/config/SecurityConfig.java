@@ -69,7 +69,8 @@ public class SecurityConfig {
                                 "/v3/api-docs.yaml",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/swagger-resources/**"
+                                "/swagger-resources/**",
+                                "/api/v1/hotels/{hotelId}/rooms"
                         ).permitAll()
                         .anyRequest()
                         .authenticated()

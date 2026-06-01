@@ -33,4 +33,16 @@ public class GlobalExceptionHandler {
         ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 400);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(HotelNotBelongException.class)
+    public ResponseEntity<ErrorResponse> handleHotelNotBelongException(HotelNotBelongException ex, WebRequest request) {
+        ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 400);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RoomNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleRoomNotFoundException(RoomNotFoundException ex, WebRequest request) {
+        ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 404);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 }

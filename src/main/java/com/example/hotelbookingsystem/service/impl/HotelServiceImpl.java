@@ -7,8 +7,7 @@ import com.example.hotelbookingsystem.exception.HotelNotFoundException;
 import com.example.hotelbookingsystem.exception.RoleNotSuitException;
 import com.example.hotelbookingsystem.exception.UserNotFoundException;
 import com.example.hotelbookingsystem.mapper.HotelMapper;
-import com.example.hotelbookingsystem.mapper.UserMapper;
-import com.example.hotelbookingsystem.payload.hotel_related.HotelRequest;
+import com.example.hotelbookingsystem.payload.hotel_related.HotelCreateRequest;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelResponse;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelUpdateRequest;
 import com.example.hotelbookingsystem.repository.HotelRepository;
@@ -29,12 +28,11 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
     private final HotelMapper hotelMapper;
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
 
     @Override
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
-    public HotelResponse createHotel(Long managerId, HotelRequest request) {
+    public HotelResponse createHotel(Long managerId, HotelCreateRequest request) {
         User user = userRepository.findById(managerId).orElseThrow(() -> new UserNotFoundException("user with id: " + managerId + ", not found"));
 
         if (user.getRole() != Role.MANAGER) {
@@ -52,7 +50,7 @@ public class HotelServiceImpl implements HotelService {
                 .build();
         hotelRepository.save(hotel);
 
-        return hotelMapper.toHotelResponse(hotel, userMapper.mapToUserResponse(user));
+        return hotelMapper.toHotelResponse(hotel);
     }
 
     @Override
@@ -61,8 +59,6 @@ public class HotelServiceImpl implements HotelService {
     public HotelResponse updateHotel(Long hotelId, Long managerId, HotelUpdateRequest request) {
         Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException("hotel with " + hotelId + " not found"));
 
-        User user = userRepository.findById(managerId).orElseThrow(() -> new UserNotFoundException("user with " + managerId + " not found"));
-
         hotel.setHotelName(request.hotelName());
         hotel.setDescription(request.description());
         hotel.setCity(request.city());
@@ -70,21 +66,21 @@ public class HotelServiceImpl implements HotelService {
         hotel.setPhoneNumber(request.phoneNumber());
         hotelRepository.save(hotel);
 
-        return hotelMapper.toHotelResponse(hotel, userMapper.mapToUserResponse(user));
+        return hotelMapper.toHotelResponse(hotel);
     }
 
     @Override
     public HotelResponse getHotelById(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException("hotel with " + hotelId + " not found"));
 
-        return hotelMapper.toHotelResponse(hotel, userMapper.mapToUserResponse(hotel.getUser()));
+        return hotelMapper.toHotelResponse(hotel);
     }
 
     @Override
     public Page<HotelResponse> searchHotels(String city, Pageable pageable) {
         Page<Hotel> hotelPage = hotelRepository.findByCityContainingIgnoreCaseAndActiveTrue(city, pageable);
 
-        return hotelPage.map(hotel -> hotelMapper.toHotelResponse(hotel, userMapper.mapToUserResponse(hotel.getUser())));
+        return hotelPage.map(hotelMapper::toHotelResponse);
     }
 
     @Override
@@ -92,7 +88,7 @@ public class HotelServiceImpl implements HotelService {
     public List<HotelResponse> getMyHotels(Long managerId) {
         User user = userRepository.findById(managerId).orElseThrow(() -> new UserNotFoundException("user with " + managerId + " not found"));
 
-        return user.getHotels().stream().map(hotel -> hotelMapper.toHotelResponse(hotel, userMapper.mapToUserResponse(user))).toList();
+        return user.getHotels().stream().map(hotelMapper::toHotelResponse).toList();
     }
 
     @Override
