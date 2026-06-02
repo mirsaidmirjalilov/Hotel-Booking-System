@@ -1,17 +1,16 @@
 package com.example.hotelbookingsystem.controller;
 
-import com.example.hotelbookingsystem.payload.auth_related.LoginRequest;
 import com.example.hotelbookingsystem.payload.auth_related.AuthResponse;
+import com.example.hotelbookingsystem.payload.auth_related.LoginRequest;
 import com.example.hotelbookingsystem.payload.auth_related.RegisterRequest;
 import com.example.hotelbookingsystem.service.AuthService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/auth")

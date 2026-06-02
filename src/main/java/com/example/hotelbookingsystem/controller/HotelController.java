@@ -7,6 +7,7 @@ import com.example.hotelbookingsystem.payload.hotel_related.HotelUpdateRequest;
 import com.example.hotelbookingsystem.payload.room_related.RoomResponse;
 import com.example.hotelbookingsystem.service.HotelService;
 import com.example.hotelbookingsystem.service.RoomService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,14 +26,14 @@ public class HotelController {
     private final RoomService roomService;
 
     @PostMapping("/{managerId}/create")
-    public ResponseEntity<BaseResponse<HotelResponse>> createHotel(@PathVariable Long managerId, @RequestBody HotelCreateRequest hotelCreateRequest) {
+    public ResponseEntity<BaseResponse<HotelResponse>> createHotel(@PathVariable Long managerId, @RequestBody @Valid HotelCreateRequest hotelCreateRequest) {
         HotelResponse hotel = hotelService.createHotel(managerId, hotelCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.ok(hotel));
     }
 
     @PutMapping("/{hotelId}/{managerId}/update")
-    public ResponseEntity<BaseResponse<HotelResponse>> updateHotel(@PathVariable Long hotelId, @PathVariable Long managerId, @RequestBody HotelUpdateRequest hotelRequest) {
+    public ResponseEntity<BaseResponse<HotelResponse>> updateHotel(@PathVariable Long hotelId, @PathVariable Long managerId, @RequestBody @Valid HotelUpdateRequest hotelRequest) {
         HotelResponse hotelResponse = hotelService.updateHotel(hotelId, managerId, hotelRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(hotelResponse));

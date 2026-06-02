@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import java.time.DateTimeException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -44,5 +46,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRoomNotFoundException(RoomNotFoundException ex, WebRequest request) {
         ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 404);
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DateTimeException.class)
+    public ResponseEntity<ErrorResponse> handleDateTimeException(DateTimeException ex, WebRequest request) {
+        ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 400);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

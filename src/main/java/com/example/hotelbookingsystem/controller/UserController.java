@@ -7,6 +7,7 @@ import com.example.hotelbookingsystem.payload.user_related.UserCreateRequest;
 import com.example.hotelbookingsystem.payload.user_related.UserResponse;
 import com.example.hotelbookingsystem.payload.user_related.UserUpdateRequest;
 import com.example.hotelbookingsystem.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse<UserResponse>> createUser(@RequestBody UserCreateRequest userCreateRequest) {
+    public ResponseEntity<BaseResponse<UserResponse>> createUser(@RequestBody @Valid UserCreateRequest userCreateRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(userService.createUser(userCreateRequest)));
     }
 
@@ -49,13 +50,13 @@ public class UserController {
 
     @PutMapping("/{userId}/profile/update")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUserProfile(@PathVariable long userId, @RequestBody UserUpdateRequest userUpdateRequest) {
+    public void updateUserProfile(@PathVariable long userId, @RequestBody @Valid UserUpdateRequest userUpdateRequest) {
         userService.updateUser(userId, userUpdateRequest);
     }
 
     @PutMapping("/{userId}/password/update")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUserPassword(@PathVariable long userId, @RequestBody ChangePasswordRequest changePasswordRequest) {
+    public void updateUserPassword(@PathVariable long userId, @RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         userService.changePassword(userId, changePasswordRequest);
     }
 }
