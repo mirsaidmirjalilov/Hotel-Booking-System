@@ -158,7 +158,7 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
 
         List<RoomInventory> updatedInventories = new ArrayList<>();
 
-        for (LocalDate date = checkIn; date.isBefore(checkOut); date = date.plusDays(1)) {
+        for (LocalDate date = checkIn; !date.isAfter(checkOut); date = date.plusDays(1)) {
 
             RoomInventory roomInventory = inventoryMap.get(date);
 
@@ -192,7 +192,7 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
 
         List<RoomInventory> updatedInventories = new ArrayList<>();
 
-        for (LocalDate date = checkIn; date.isBefore(checkOut); date = date.plusDays(1)) {
+        for (LocalDate date = checkIn; !date.isAfter(checkOut); date = date.plusDays(1)) {
 
             RoomInventory roomInventory = inventoryMap.get(date);
 
