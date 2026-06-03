@@ -47,6 +47,9 @@ public class RoomServiceImpl implements RoomService {
                 .build();
         roomRepository.save(room);
 
+        hotel.getRooms().add(room);
+
+        hotelRepository.save(hotel);
         return roomMapper.toRoomResponse(room);
     }
 
@@ -55,6 +58,7 @@ public class RoomServiceImpl implements RoomService {
     @PreAuthorize("hasAnyRole('MANAGER')")
     public RoomResponse updateRoom(Long roomId, RoomUpdateRequest request) {
         Room room = getRoomAndValidateHotelWithManager(roomId);
+        Hotel hotel = getHotelWithManager(request.hotelId());
 
         room.setTotalRooms(request.totalRooms());
         room.setBasePrice(request.basePrice());
@@ -62,7 +66,7 @@ public class RoomServiceImpl implements RoomService {
         room.setIsActive(true);
         room.setCapacity(request.capacity());
         room.setRoomType(request.roomType());
-        room.setHotel(hotelRepository.findById(request.hotelId()).orElseThrow(() -> new HotelNotFoundException("hotel not found")));
+        room.setHotel(hotel);
         room.setImageUrls(request.imageUrls());
         roomRepository.save(room);
 
@@ -90,16 +94,18 @@ public class RoomServiceImpl implements RoomService {
     @PreAuthorize("hasAnyRole('MANAGER')")
     public void deleteRoom(Long roomId) {
         Room room = getRoomAndValidateHotelWithManager(roomId);
-
         room.setIsActive(false);
+
+        room.getHotel().getRooms().remove(room);
+
         roomRepository.save(room);
     }
 
     protected Room getRoomAndValidateHotelWithManager(Long roomId){
-        User user = securityUtils.getCurrentUser();
+        User user = SecurityUtils.getCurrentUser();
         Room room =  roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("room not found"));
 
-        if (room.getHotel().getUser().getId().equals(user.getId())) {
+        if (!room.getHotel().getUser().getId().equals(user.getId())) {
             throw new HotelNotBelongException("hotel not found");
         }
 
@@ -107,10 +113,10 @@ public class RoomServiceImpl implements RoomService {
     }
 
     private Hotel getHotelWithManager(Long hotelId) {
-        User user = securityUtils.getCurrentUser();
+        User user = SecurityUtils.getCurrentUser();
         Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException("hotel not found"));
 
-        if (hotel.getUser().getId().equals(user.getId())) {
+        if (!hotel.getUser().getId().equals(user.getId())) {
             throw new HotelNotBelongException("hotel not found");
         }
 

@@ -25,7 +25,7 @@ public class HotelController {
     private final HotelService hotelService;
     private final RoomService roomService;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<BaseResponse<HotelResponse>> createHotel(@RequestBody @Valid HotelCreateRequest hotelCreateRequest) {
         HotelResponse hotel = hotelService.createHotel(hotelCreateRequest);
 

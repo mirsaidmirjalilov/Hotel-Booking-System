@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record BookingCreateRequest(
-       @NotNull @Positive Long roomId,
+        @NotNull @Positive Long roomId,
         @NotNull LocalDate checkIn,
         @NotNull LocalDate checkOut,
         @NotNull @Positive Integer totalGuests

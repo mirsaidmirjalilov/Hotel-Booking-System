@@ -12,7 +12,7 @@ public interface BookingService {
 
     BookingResponse getBookingById(Long bookingId);
 
-    List<BookingResponse> getUserBookings(Long userId);
+    List<BookingResponse> getUserBookings();
 
     void cancelBooking(Long bookingId);
 

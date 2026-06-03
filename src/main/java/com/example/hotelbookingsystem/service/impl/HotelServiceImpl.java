@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,13 +28,12 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
     private final HotelMapper hotelMapper;
     private final UserRepository userRepository;
-    private final SecurityUtils  securityUtils;
 
     @Override
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
     public HotelResponse createHotel(HotelCreateRequest request) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = SecurityUtils.getCurrentUser();
 
         Hotel hotel = Hotel.builder()
                 .hotelName(request.hotelName())
@@ -107,7 +105,7 @@ public class HotelServiceImpl implements HotelService {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new HotelNotFoundException("Hotel not found"));
 
-        User user = securityUtils.getCurrentUser();
+        User user = SecurityUtils.getCurrentUser();
 
         if (hotel.getUser().getId().equals(user.getId())) {
             throw new HotelNotBelongException("hotel not found");

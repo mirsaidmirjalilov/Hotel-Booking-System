@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,12 +15,12 @@ public record BookingResponse(
         Long bookingId,
         String hotelName,
         String roomType,
-        LocalDate checkIn,
-        LocalDate checkOut,
+        LocalDateTime checkIn,
+        LocalDateTime checkOut,
         Integer totalGuests,
         BigDecimal totalPrice,
         BookingStatus bookingStatus,
         PaymentStatus paymentStatus,
-        LocalDate bookedAt
+        LocalDateTime bookedAt
 ) {
 }
