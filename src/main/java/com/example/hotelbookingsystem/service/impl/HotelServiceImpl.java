@@ -2,9 +2,8 @@ package com.example.hotelbookingsystem.service.impl;
 
 import com.example.hotelbookingsystem.entity.Hotel;
 import com.example.hotelbookingsystem.entity.User;
-import com.example.hotelbookingsystem.enums.Role;
+import com.example.hotelbookingsystem.exception.HotelNotBelongException;
 import com.example.hotelbookingsystem.exception.HotelNotFoundException;
-import com.example.hotelbookingsystem.exception.RoleNotSuitException;
 import com.example.hotelbookingsystem.exception.UserNotFoundException;
 import com.example.hotelbookingsystem.mapper.HotelMapper;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelCreateRequest;
@@ -12,12 +11,14 @@ import com.example.hotelbookingsystem.payload.hotel_related.HotelResponse;
 import com.example.hotelbookingsystem.payload.hotel_related.HotelUpdateRequest;
 import com.example.hotelbookingsystem.repository.HotelRepository;
 import com.example.hotelbookingsystem.repository.UserRepository;
+import com.example.hotelbookingsystem.security.SecurityUtils;
 import com.example.hotelbookingsystem.service.HotelService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,16 +29,13 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
     private final HotelMapper hotelMapper;
     private final UserRepository userRepository;
+    private final SecurityUtils  securityUtils;
 
     @Override
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
-    public HotelResponse createHotel(Long managerId, HotelCreateRequest request) {
-        User user = userRepository.findById(managerId).orElseThrow(() -> new UserNotFoundException("user with id: " + managerId + ", not found"));
-
-        if (user.getRole() != Role.MANAGER) {
-            throw new RoleNotSuitException("user with id: " + user.getId() + " doesn't have appropriate role for this");
-        }
+    public HotelResponse createHotel(HotelCreateRequest request) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Hotel hotel = Hotel.builder()
                 .hotelName(request.hotelName())
@@ -56,8 +54,8 @@ public class HotelServiceImpl implements HotelService {
     @Override
     @PreAuthorize("hasAnyRole('MANAGER')")
     @Transactional
-    public HotelResponse updateHotel(Long hotelId, Long managerId, HotelUpdateRequest request) {
-        Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException("hotel with " + hotelId + " not found"));
+    public HotelResponse updateHotel(Long hotelId, HotelUpdateRequest request) {
+        Hotel hotel = getHotelAndValidateManager(hotelId);
 
         hotel.setHotelName(request.hotelName());
         hotel.setDescription(request.description());
@@ -94,19 +92,27 @@ public class HotelServiceImpl implements HotelService {
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Transactional
-    public void deleteHotel(Long hotelId, Long managerId) {
-        Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException("hotel with " + hotelId + " not found"));
+    public void deleteHotel(Long hotelId) {
+        Hotel hotel = getHotelAndValidateManager(hotelId);
+
         hotel.setActive(false);
         hotel.setUser(null);
         hotelRepository.save(hotel);
 
-        User user = userRepository.findById(managerId).orElseThrow(() -> new UserNotFoundException("user with " + managerId + " not found"));
+        hotel.getUser().getHotels().remove(hotel);
+        userRepository.save(hotel.getUser());
+    }
 
-        if (!user.getHotels().contains(hotel)) {
-            throw new IllegalArgumentException("Manager with ID " + managerId + " is not assigned to this hotel.");
+    private Hotel getHotelAndValidateManager(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new HotelNotFoundException("Hotel not found"));
+
+        User user = securityUtils.getCurrentUser();
+
+        if (hotel.getUser().getId().equals(user.getId())) {
+            throw new HotelNotBelongException("hotel not found");
         }
 
-        user.getHotels().remove(hotel);
-        userRepository.save(user);
+        return hotel;
     }
 }

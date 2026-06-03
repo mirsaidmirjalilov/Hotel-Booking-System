@@ -17,16 +17,16 @@ import org.springframework.web.bind.annotation.*;
 public class RoomController {
     private final RoomService roomService;
 
-    @PostMapping("/{managerId}/{hotelId}/create")
-    public ResponseEntity<BaseResponse<RoomResponse>> createRoom(@RequestBody @Valid RoomCreateRequest request, @PathVariable Long managerId, @PathVariable Long hotelId) {
-        RoomResponse room = roomService.createRoom(managerId, hotelId, request);
+    @PostMapping("/{hotelId}/create")
+    public ResponseEntity<BaseResponse<RoomResponse>> createRoom(@RequestBody @Valid RoomCreateRequest request, @PathVariable Long hotelId) {
+        RoomResponse room = roomService.createRoom(hotelId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.ok(room));
     }
 
-    @PutMapping("/{managerId}/{hotelId}/update")
-    ResponseEntity<BaseResponse<RoomResponse>> updateRoom(@RequestBody @Valid RoomUpdateRequest request, @PathVariable Long managerId, @PathVariable Long hotelId) {
-        RoomResponse room = roomService.updateRoom(managerId, hotelId, request);
+    @PutMapping("/{roomId}/update")
+    ResponseEntity<BaseResponse<RoomResponse>> updateRoom(@RequestBody @Valid RoomUpdateRequest request, @PathVariable Long roomId) {
+        RoomResponse room = roomService.updateRoom(roomId, request);
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(room));
     }
@@ -39,7 +39,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{managerId}/{roomId}")
-    public void deleteRoom(@PathVariable Long roomId, @PathVariable Long managerId) {
-        roomService.deleteRoom(managerId,roomId);
+    public void deleteRoom(@PathVariable Long roomId) {
+        roomService.deleteRoom(roomId);
     }
 }

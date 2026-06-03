@@ -9,10 +9,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface HotelService {
-    HotelResponse createHotel(Long managerId, HotelCreateRequest request);
-    HotelResponse updateHotel(Long hotelId, Long managerId, HotelUpdateRequest request);
+    HotelResponse createHotel(HotelCreateRequest request);
+    HotelResponse updateHotel(Long hotelId, HotelUpdateRequest request);
     HotelResponse getHotelById(Long hotelId);
     Page<HotelResponse> searchHotels(String city, Pageable pageable);
     List<HotelResponse> getMyHotels(Long managerId);
-    void deleteHotel(Long hotelId, Long managerId);
+    void deleteHotel(Long hotelId);
 }

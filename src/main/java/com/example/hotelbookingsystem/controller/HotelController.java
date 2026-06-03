@@ -25,16 +25,16 @@ public class HotelController {
     private final HotelService hotelService;
     private final RoomService roomService;
 
-    @PostMapping("/{managerId}/create")
-    public ResponseEntity<BaseResponse<HotelResponse>> createHotel(@PathVariable Long managerId, @RequestBody @Valid HotelCreateRequest hotelCreateRequest) {
-        HotelResponse hotel = hotelService.createHotel(managerId, hotelCreateRequest);
+    @PostMapping("/create")
+    public ResponseEntity<BaseResponse<HotelResponse>> createHotel(@RequestBody @Valid HotelCreateRequest hotelCreateRequest) {
+        HotelResponse hotel = hotelService.createHotel(hotelCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.ok(hotel));
     }
 
-    @PutMapping("/{hotelId}/{managerId}/update")
-    public ResponseEntity<BaseResponse<HotelResponse>> updateHotel(@PathVariable Long hotelId, @PathVariable Long managerId, @RequestBody @Valid HotelUpdateRequest hotelRequest) {
-        HotelResponse hotelResponse = hotelService.updateHotel(hotelId, managerId, hotelRequest);
+    @PutMapping("/{hotelId}/update")
+    public ResponseEntity<BaseResponse<HotelResponse>> updateHotel(@PathVariable Long hotelId,@RequestBody @Valid HotelUpdateRequest hotelRequest) {
+        HotelResponse hotelResponse = hotelService.updateHotel(hotelId,hotelRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(hotelResponse));
     }
@@ -53,10 +53,10 @@ public class HotelController {
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(myHotels));
     }
 
-    @DeleteMapping("/{hotelId}/{managerId}")
+    @DeleteMapping("/{hotelId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteHotel(@PathVariable Long hotelId, @PathVariable Long managerId) {
-        hotelService.deleteHotel(hotelId, managerId);
+    public void deleteHotel(@PathVariable Long hotelId) {
+        hotelService.deleteHotel(hotelId);
     }
 
     @GetMapping("/search")

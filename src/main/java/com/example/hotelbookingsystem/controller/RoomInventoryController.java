@@ -22,7 +22,7 @@ public class RoomInventoryController {
 
     @PostMapping("/{managerId}/manager/{roomId}/room/inventory/bulk")
     public ResponseEntity<BaseResponse<List<InventoryResponse>>> bulk(@PathVariable Long roomId, @RequestBody @Valid BulkInventoryRequest request, @PathVariable Long managerId) {
-        List<InventoryResponse> inventoryResponses = roomInventoryService.bulkUpdateInventory(managerId, roomId, request);
+        List<InventoryResponse> inventoryResponses = roomInventoryService.bulkUpdateInventory(roomId, request);
 
         return ResponseEntity.status(200).body(BaseResponse.ok(inventoryResponses));
     }

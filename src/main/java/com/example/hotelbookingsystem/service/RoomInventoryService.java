@@ -12,7 +12,7 @@ public interface RoomInventoryService {
     boolean isRoomAvailable(Long roomId,AvailabilityCheckRequest request);
     List<InventoryResponse> getDailyAvailability(Long roomId, LocalDate startDate, LocalDate endDate);
     InventoryResponse updateInventory(Long managerId, Long roomId, InventoryUpdateRequest request);
-    List<InventoryResponse> bulkUpdateInventory(Long managerId, Long roomId, BulkInventoryRequest request);
+    List<InventoryResponse> bulkUpdateInventory(Long roomId, BulkInventoryRequest request);
     void blockInventory(Long roomId, LocalDate checkIn, LocalDate checkOut, int roomsToBlock);
     void releaseInventory(Long roomId, LocalDate checkIn, LocalDate checkOut, int roomsToRelease);
     List<InventoryResponse> initializeInventoryForRoom(Long roomId, int monthsAhead);
