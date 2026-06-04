@@ -1,6 +1,9 @@
 package com.example.hotelbookingsystem.service.impl;
 
-import com.example.hotelbookingsystem.entity.*;
+import com.example.hotelbookingsystem.entity.Booking;
+import com.example.hotelbookingsystem.entity.Hotel;
+import com.example.hotelbookingsystem.entity.Payment;
+import com.example.hotelbookingsystem.entity.User;
 import com.example.hotelbookingsystem.enums.PaymentStatus;
 import com.example.hotelbookingsystem.exception.BookingNotFoundException;
 import com.example.hotelbookingsystem.mapper.PaymentMapper;
@@ -12,14 +15,16 @@ import com.example.hotelbookingsystem.repository.PaymentRepository;
 import com.example.hotelbookingsystem.security.SecurityUtils;
 import com.example.hotelbookingsystem.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +37,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"userPayments", "hotelPayments"}, allEntries = true)
     public PaymentResponse createPayment(PaymentMockRequest paymentMockRequest) {
         User currentUser = SecurityUtils.getCurrentUser();
         Booking booking = bookingRepository.findByIdAndUserId(paymentMockRequest.booingId(), currentUser.getId()).orElseThrow(() -> new BookingNotFoundException("booking id not found"));
-        
+
         if (booking.getPaymentStatus() == PaymentStatus.PAID){
             throw new RuntimeException("payment status is PAID");
         }
@@ -73,6 +79,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
+    @CacheEvict(value = {"userPayments", "hotelPayments"}, allEntries = true)
     public PaymentResponse cancelPayment(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new BookingNotFoundException("booking id not found"));
 
@@ -89,6 +97,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Cacheable(value = "userPayments", key = "T(com.example.hotelbookingsystem.security.SecurityUtils).getCurrentUser().getId()")
     public List<PaymentResponse> getUserPayments() {
         List<Booking> booking = bookingRepository.findByUserId(SecurityUtils.getCurrentUser().getId());
         List<Payment> payments = new ArrayList<>();
@@ -104,6 +113,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @PreAuthorize("hasRole('MANAGER')")
+    @Cacheable(value = "hotelPayments", key = "#hotelId")
     public List<PaymentResponse> getHotelPayments(Long hotelId) {
         Hotel hotel = hotelRepository.findByIdAndUserId(hotelId, SecurityUtils.getCurrentUser().getId()).orElseThrow(() -> new AccessDeniedException("user dont have access for this hotel"));
 

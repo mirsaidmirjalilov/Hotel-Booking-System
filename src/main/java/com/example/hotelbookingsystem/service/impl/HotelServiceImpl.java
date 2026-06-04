@@ -15,6 +15,9 @@ import com.example.hotelbookingsystem.security.SecurityUtils;
 import com.example.hotelbookingsystem.service.HotelService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +35,7 @@ public class HotelServiceImpl implements HotelService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
+    @CacheEvict(value = {"hotels", "myHotels", "searchHotels"}, allEntries = true)
     public HotelResponse createHotel(HotelCreateRequest request) {
         User user = SecurityUtils.getCurrentUser();
 
@@ -52,6 +56,8 @@ public class HotelServiceImpl implements HotelService {
     @Override
     @PreAuthorize("hasAnyRole('MANAGER')")
     @Transactional
+    @CachePut(value = "hotels", key = "#hotelId")
+    @CacheEvict(value = {"myHotels", "searchHotels"}, allEntries = true)
     public HotelResponse updateHotel(Long hotelId, HotelUpdateRequest request) {
         Hotel hotel = getHotelAndValidateManager(hotelId);
 
@@ -66,6 +72,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Cacheable(value = "hotels", key = "#hotelId")
     public HotelResponse getHotelById(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException("hotel with " + hotelId + " not found"));
 
@@ -73,6 +80,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Cacheable(value = "searchHotels", key = "#city + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
     public Page<HotelResponse> searchHotels(String city, Pageable pageable) {
         Page<Hotel> hotelPage = hotelRepository.findByCityContainingIgnoreCaseAndActiveTrue(city, pageable);
 
@@ -81,6 +89,7 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     @PreAuthorize("hasAnyRole('MANAGER')")
+    @Cacheable(value = "myHotels", key = "#managerId")
     public List<HotelResponse> getMyHotels(Long managerId) {
         User user = userRepository.findById(managerId).orElseThrow(() -> new UserNotFoundException("user with " + managerId + " not found"));
 
@@ -90,6 +99,7 @@ public class HotelServiceImpl implements HotelService {
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Transactional
+    @CacheEvict(value = {"hotels", "myHotels", "searchHotels"}, allEntries = true)
     public void deleteHotel(Long hotelId) {
         Hotel hotel = getHotelAndValidateManager(hotelId);
 

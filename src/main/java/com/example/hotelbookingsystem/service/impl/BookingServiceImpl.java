@@ -13,10 +13,11 @@ import com.example.hotelbookingsystem.payload.booking_related.BookingResponse;
 import com.example.hotelbookingsystem.repository.BookingRepository;
 import com.example.hotelbookingsystem.repository.HotelRepository;
 import com.example.hotelbookingsystem.repository.RoomRepository;
-import com.example.hotelbookingsystem.repository.UserRepository;
 import com.example.hotelbookingsystem.security.SecurityUtils;
 import com.example.hotelbookingsystem.service.BookingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"userBookings", "hotelBookings", "bookings"}, allEntries = true)
     public BookingResponse createBooking(BookingCreateRequest payload) {
         Room room = roomService.getRoomAndValidateHotelWithManager(payload.roomId());
 
@@ -62,6 +64,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Cacheable(value = "bookings", key = "#bookingId")
     public BookingResponse getBookingById(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException("booking not found"));
 
@@ -69,6 +72,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Cacheable(value = "userBookings", key = "T(com.example.hotelbookingsystem.security.SecurityUtils).getCurrentUser().getId()")
     public List<BookingResponse> getUserBookings() {
         User user = SecurityUtils.getCurrentUser();
 
@@ -78,6 +82,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
+    @CacheEvict(value = {"userBookings", "hotelBookings", "bookings"}, allEntries = true)
     public void cancelBooking(Long bookingId) {
         Booking booking = getBookingAndValidateUser(bookingId);
 
@@ -88,6 +94,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Cacheable(value = "hotelBookings", key = "#hotelId + '_' + #startDate + '_' + #endDate")
     public List<BookingResponse> getHotelBookings(Long hotelId, LocalDate startDate, LocalDate endDate) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new BookingNotFoundException("Hotel not found with id: " + hotelId));
@@ -97,11 +104,13 @@ public class BookingServiceImpl implements BookingService {
         return rooms.stream()
                 .flatMap(room -> room.getBooking().stream())
                 .filter(booking -> isBookingInDateRange(booking, startDate, endDate))
-                .map(bookingMapper::toBookingResponse)      // Assuming you have a mapper
+                .map(bookingMapper::toBookingResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
+    @CacheEvict(value = {"userBookings", "hotelBookings", "bookings"}, allEntries = true)
     public void updateBookingStatus(Long bookingId, BookingStatus newStatus) {
         Booking booking = getBookingAndValidateUser(bookingId);
 

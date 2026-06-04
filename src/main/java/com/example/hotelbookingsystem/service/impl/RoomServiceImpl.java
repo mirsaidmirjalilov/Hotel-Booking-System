@@ -16,6 +16,9 @@ import com.example.hotelbookingsystem.security.SecurityUtils;
 import com.example.hotelbookingsystem.service.RoomService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     @PreAuthorize("hasAnyRole('MANAGER')")
+    @CacheEvict(value = "hotelRooms", key = "#hotelId")
     public RoomResponse createRoom(Long hotelId, RoomCreateRequest request) {
         Hotel hotel = getHotelWithManager(hotelId);
 
@@ -56,6 +60,8 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     @PreAuthorize("hasAnyRole('MANAGER')")
+    @CachePut(value = "rooms", key = "#roomId")
+    @CacheEvict(value = "hotelRooms", key = "#request.hotelId()")
     public RoomResponse updateRoom(Long roomId, RoomUpdateRequest request) {
         Room room = getRoomAndValidateHotelWithManager(roomId);
         Hotel hotel = getHotelWithManager(request.hotelId());
@@ -74,6 +80,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Cacheable(value = "rooms", key = "#roomId")
     public RoomResponse getRoomById(Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("room not found"));
 
@@ -81,6 +88,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Cacheable(value = "hotelRooms", key = "#hotelId")
     public List<RoomResponse> getRoomsByHotel(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException("hotel not found"));
 
@@ -92,6 +100,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     @PreAuthorize("hasAnyRole('MANAGER')")
+    @CacheEvict(value = {"rooms", "hotelRooms"}, key = "#roomId")
     public void deleteRoom(Long roomId) {
         Room room = getRoomAndValidateHotelWithManager(roomId);
         room.setIsActive(false);

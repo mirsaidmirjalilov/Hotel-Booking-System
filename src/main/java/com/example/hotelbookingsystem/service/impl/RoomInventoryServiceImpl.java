@@ -15,6 +15,8 @@ import com.example.hotelbookingsystem.repository.RoomRepository;
 import com.example.hotelbookingsystem.security.SecurityUtils;
 import com.example.hotelbookingsystem.service.RoomInventoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +34,9 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
     private final RoomInventoryRepository roomInventoryRepository;
     private final RoomRepository roomRepository;
     private final RoomInventoryMapper roomInventoryMapper;
-    private final SecurityUtils securityUtils;
 
     @Override
+    @Cacheable(value = "roomAvailability", key = "#roomId + '_' + #request.checkIn() + '_' + #request.checkOut() + '_' + #request.requestedRooms()")
     public boolean isRoomAvailable(Long roomId, AvailabilityCheckRequest request) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found"));
@@ -61,6 +63,7 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
     }
 
     @Override
+    @Cacheable(value = "roomDailyInventory", key = "#roomId + '_' + #startDate + '_' + #endDate")
     public List<InventoryResponse> getDailyAvailability(Long roomId, LocalDate startDate, LocalDate endDate) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room with ID " + roomId + " not found"));
@@ -91,6 +94,7 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
+    @CacheEvict(value = {"roomAvailability", "roomDailyInventory"}, key = "#roomId")
     public InventoryResponse updateInventory(Long managerId, Long roomId, InventoryUpdateRequest request) {
         Room room = getRoomAndValidateManager(roomId);
 
@@ -108,6 +112,7 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
+    @CacheEvict(value = {"roomAvailability", "roomDailyInventory"}, key = "#roomId")
     public List<InventoryResponse> bulkUpdateInventory(Long roomId, BulkInventoryRequest request) {
         Room room = getRoomAndValidateManager(roomId);
 
@@ -142,6 +147,7 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"roomAvailability", "roomDailyInventory"}, key = "#roomId")
     public void blockInventory(Long roomId, LocalDate checkIn, LocalDate checkOut, int roomsToBlock) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room with ID " + roomId + " not found"));
@@ -176,6 +182,7 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"roomAvailability", "roomDailyInventory"}, key = "#roomId")
     public void releaseInventory(Long roomId, LocalDate checkIn, LocalDate checkOut, int roomsToRelease) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room with ID " + roomId + " not found"));
@@ -212,6 +219,7 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
+    @CacheEvict(value = {"roomAvailability", "roomDailyInventory"}, key = "#roomId")
     public List<InventoryResponse> initializeInventoryForRoom(Long roomId, int monthsAhead) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room with id: " + roomId + " not found"));
@@ -261,7 +269,7 @@ public class RoomInventoryServiceImpl implements RoomInventoryService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found"));
 
-        User user = securityUtils.getCurrentUser();
+        User user = SecurityUtils.getCurrentUser();
 
         if (room.getHotel().getUser().getId().equals(user.getId())) {
             throw new HotelNotBelongException("hotel not found");

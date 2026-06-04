@@ -16,19 +16,50 @@ spring:
           batch_size: 20
         order_updates: true
         order_inserts: true
-
+      cache:
+        type: redis
   datasource:
-      url: jdbc:postgresql://localhost:5432/postgres
-      username: postgres
-      password: 123
-      driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
 
   liquibase:
     change-log: classpath:db/changelog/changeset/changelog-master.yml
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  cache:
+    type: redis
+    cache-names:
+      - users
+      - userProfile
+      - hotels
+      - rooms
+      - hotelRooms
+      - bookings
+      - userBookings
+      - hotelBookings
+      - roomAvailability
+      - roomDailyInventory
+      - hotelReviews
+      - userReviews
+      - reviewByBooking
+      - userPayments
+      - hotelPayments
+      - searchHotels
+      - myHotels
+    redis:
+      time-to-live: 1800000          # Default TTL: 30 minutes (in milliseconds)
+      cache-null-values: false
+      use-key-prefix: true
+
 springdoc:
   swagger-ui:
-      path: /swagger-ui.html
+    path: /swagger-ui.html
 
 jwt:
   secret: h5EZlzbaBmZLL8NWf3M5assLtlIymAa3GbwyPd7oZpJ

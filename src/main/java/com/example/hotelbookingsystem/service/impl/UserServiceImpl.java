@@ -10,9 +10,12 @@ import com.example.hotelbookingsystem.payload.user_related.UserUpdateRequest;
 import com.example.hotelbookingsystem.repository.UserRepository;
 import com.example.hotelbookingsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +23,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder bCryptPasswordEncoder;
     private final UserMapper userMapper;
 
     @Override
+    @CacheEvict(value = "users", allEntries = true)
     public UserResponse createUser(UserCreateRequest createRequest) {
         if (userRepository.findByEmail(createRequest.email()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
@@ -44,15 +49,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "userProfile", key = "#id")
     public UserResponse getUserProfile(Long id) {
-        User user = userRepository.findById((id)).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return userMapper.mapToUserResponse(user);
     }
 
     @Override
+    @CachePut(value = "userProfile", key = "#id")
+    @CacheEvict(value = "users", allEntries = true)
     public UserResponse updateUser(Long id, UserUpdateRequest updateRequest) {
-        User user = userRepository.findById((id)).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         user.setFullName(updateRequest.fullName());
         user.setPhoneNumber(updateRequest.phoneNumber());
@@ -63,8 +71,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = {"userProfile", "users"}, key = "#id")
     public void changePassword(Long id, ChangePasswordRequest changePasswordRequest) {
-        User user = userRepository.findById((id)).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (changePasswordRequest.oldPassword().equals(changePasswordRequest.newPassword())){
             throw new IllegalArgumentException("Passwords can not be identical");
@@ -79,6 +88,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "users")
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers() {
         return userRepository.findAll().stream()
@@ -87,18 +97,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = {"userProfile", "users"}, key = "#id")
     @PreAuthorize("hasRole('ADMIN')")
     public void changeUserRole(Long id, Role role) {
-        User user = userRepository.findById((id)).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         user.setRole(role);
         userRepository.save(user);
     }
 
     @Override
+    @CacheEvict(value = {"userProfile", "users"}, key = "#userId")
     @PreAuthorize("hasRole('ADMIN')")
     public void enableOrDisableUser(Long userId, boolean enable) {
-        User user = userRepository.findById((userId)).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         user.setIsActive(enable);
         userRepository.save(user);

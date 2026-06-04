@@ -1,7 +1,5 @@
 package com.example.hotelbookingsystem.service.impl;
 
-import com.example.hotelbookingsystem.entity.Booking;
-import com.example.hotelbookingsystem.entity.Hotel;
 import com.example.hotelbookingsystem.entity.Review;
 import com.example.hotelbookingsystem.entity.User;
 import com.example.hotelbookingsystem.exception.BookingNotFoundException;
@@ -18,16 +16,14 @@ import com.example.hotelbookingsystem.security.SecurityUtils;
 import com.example.hotelbookingsystem.service.ReviewService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -40,6 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"hotelReviews", "userReviews"}, allEntries = true)
     public ReviewHotelResponse createHotelReview(ReviewCreateRequest request) {
         Review review = Review.builder()
                 .hotel(hotelRepository.findById(request.id()).orElseThrow(() -> new HotelNotFoundException("hotel not found")))
@@ -55,6 +52,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"hotelReviews", "userReviews"}, allEntries = true)
     public ReviewBookingResponse createBookingReview(ReviewCreateRequest request) {
         Review review = Review.builder()
                 .booking(bookingRepository.findById(request.id()).orElseThrow(() -> new BookingNotFoundException("hotel not found")))
@@ -71,6 +69,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
+    @CacheEvict(value = {"hotelReviews", "userReviews"}, allEntries = true)
     public void deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new HotelNotFoundException("hotel not found"));
 
@@ -78,6 +77,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Cacheable(value = "reviewByBooking", key = "#bookingId")
     public ReviewBookingResponse getReviewByBookingId(Long bookingId) {
         Review review = reviewRepository.findByBookingId(bookingId).orElseThrow(() -> new HotelNotFoundException("hotel not found"));
 
@@ -85,6 +85,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Cacheable(value = "hotelReviews", key = "#hotelId + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
     public Page<ReviewHotelResponse> getHotelReviews(Long hotelId, Pageable pageable) {
         Page<Review> reviews = reviewRepository.findByHotelId(hotelId, pageable);
 
@@ -92,6 +93,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Cacheable(value = "userReviews", key = "#user.getId()")
     public List<ReviewResponse> getUserReviews() {
         User user = SecurityUtils.getCurrentUser();
 
