@@ -51,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
                 .status(BookingStatus.PENDING)
                 .totalGuests(payload.totalGuests())
                 .totalPrice(totalPrice)
-                .paymentStatus(PaymentStatus.PAID)
+                .paymentStatus(PaymentStatus.PENDING)
                 .build();
         room.getBooking().add(booking);
 

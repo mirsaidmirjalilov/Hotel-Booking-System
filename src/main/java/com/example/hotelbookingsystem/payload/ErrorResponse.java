@@ -1,22 +1,21 @@
 package com.example.hotelbookingsystem.payload;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErrorResponse {
-    String errorPath;
-    String errorMessage;
-    Integer errorCode;
-    LocalDateTime timestamp;
-    Boolean success;
-
-    private ErrorResponse() {
-        this.timestamp = LocalDateTime.now();
-        this.success = false; // default for error responses
-    }
-
+    private String errorPath;
+    private String errorMessage;
+    private Integer errorCode;
+    private final LocalDateTime  timestamp = LocalDateTime.now();
+    private final boolean success = false;
 
     public static ErrorResponse error(String errorPath, String errorMessage, Integer errorCode) {
         ErrorResponse response = new ErrorResponse();
