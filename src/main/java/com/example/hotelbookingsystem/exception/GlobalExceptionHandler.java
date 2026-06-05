@@ -59,4 +59,16 @@ public class GlobalExceptionHandler {
         ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 404);
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentNotFoundException(PaymentNotFoundException ex, WebRequest request) {
+        ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 404);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReviewNotFoundException(ReviewNotFoundException ex, WebRequest request) {
+        ErrorResponse error = ErrorResponse.error(request.getContextPath(), ex.getMessage(), 404);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 }

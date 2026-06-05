@@ -6,6 +6,7 @@ import com.example.hotelbookingsystem.entity.Payment;
 import com.example.hotelbookingsystem.entity.User;
 import com.example.hotelbookingsystem.enums.PaymentStatus;
 import com.example.hotelbookingsystem.exception.BookingNotFoundException;
+import com.example.hotelbookingsystem.exception.PaymentNotFoundException;
 import com.example.hotelbookingsystem.mapper.PaymentMapper;
 import com.example.hotelbookingsystem.payload.payment_related.PaymentMockRequest;
 import com.example.hotelbookingsystem.payload.payment_related.PaymentResponse;
@@ -82,7 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     @CacheEvict(value = {"userPayments", "hotelPayments"}, allEntries = true)
     public PaymentResponse cancelPayment(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new BookingNotFoundException("booking id not found"));
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new PaymentNotFoundException("booking id not found"));
 
         payment.setPaymentStatus(PaymentStatus.CANCELLED);
         payment.setBooking(null);

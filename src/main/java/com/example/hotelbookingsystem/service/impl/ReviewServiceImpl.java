@@ -4,6 +4,7 @@ import com.example.hotelbookingsystem.entity.Review;
 import com.example.hotelbookingsystem.entity.User;
 import com.example.hotelbookingsystem.exception.BookingNotFoundException;
 import com.example.hotelbookingsystem.exception.HotelNotFoundException;
+import com.example.hotelbookingsystem.exception.ReviewNotFoundException;
 import com.example.hotelbookingsystem.mapper.ReviewMapper;
 import com.example.hotelbookingsystem.payload.review_related.ReviewBookingResponse;
 import com.example.hotelbookingsystem.payload.review_related.ReviewCreateRequest;
@@ -71,7 +72,7 @@ public class ReviewServiceImpl implements ReviewService {
     @PreAuthorize("hasRole('MANAGER')")
     @CacheEvict(value = {"hotelReviews", "userReviews"}, allEntries = true)
     public void deleteReview(Long reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new HotelNotFoundException("hotel not found"));
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException("review not found"));
 
         reviewRepository.delete(review);
     }
@@ -79,7 +80,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Cacheable(value = "reviewByBooking", key = "#bookingId")
     public ReviewBookingResponse getReviewByBookingId(Long bookingId) {
-        Review review = reviewRepository.findByBookingId(bookingId).orElseThrow(() -> new HotelNotFoundException("hotel not found"));
+        Review review = reviewRepository.findByBookingId(bookingId).orElseThrow(() -> new ReviewNotFoundException("review not found"));
 
         return reviewMapper.toReviewBookingResponse(review);
     }

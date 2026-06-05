@@ -20,14 +20,14 @@ import java.util.List;
 public class RoomInventoryController {
     private final RoomInventoryService roomInventoryService;
 
-    @PostMapping("/{managerId}/manager/{roomId}/room/inventory/bulk")
-    public ResponseEntity<BaseResponse<List<InventoryResponse>>> bulk(@PathVariable Long roomId, @RequestBody @Valid BulkInventoryRequest request, @PathVariable Long managerId) {
+    @PostMapping("/manager/{roomId}/room/inventory/bulk")
+    public ResponseEntity<BaseResponse<List<InventoryResponse>>> bulk(@PathVariable Long roomId, @RequestBody @Valid BulkInventoryRequest request) {
         List<InventoryResponse> inventoryResponses = roomInventoryService.bulkUpdateInventory(roomId, request);
 
         return ResponseEntity.status(200).body(BaseResponse.ok(inventoryResponses));
     }
 
-    @PutMapping("/{managerId}/manager/{roomId}/room/inventory/update")
+    @PutMapping("/{managerId}/manager/{roomId}/room/inventory")
     public ResponseEntity<BaseResponse<InventoryResponse>> update(@PathVariable Long managerId, @PathVariable Long roomId, @RequestBody @Valid InventoryUpdateRequest request) {
         InventoryResponse inventoryResponse = roomInventoryService.updateInventory(managerId, roomId, request);
 

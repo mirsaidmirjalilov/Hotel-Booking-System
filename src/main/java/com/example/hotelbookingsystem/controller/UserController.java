@@ -31,7 +31,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(userService.createUser(userCreateRequest)));
     }
 
-    @PutMapping("/{userId}/role/update")
+    @PutMapping("/{userId}/role")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeUserRole(@PathVariable Long userId, Role role) {
         userService.changeUserRole(userId, role);
@@ -48,13 +48,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(userService.getUserProfile(userId)));
     }
 
-    @PutMapping("/{userId}/profile/update")
+    @PutMapping("/{userId}/profile")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUserProfile(@PathVariable long userId, @RequestBody @Valid UserUpdateRequest userUpdateRequest) {
         userService.updateUser(userId, userUpdateRequest);
     }
 
-    @PutMapping("/{userId}/password/update")
+    @PutMapping("/{userId}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUserPassword(@PathVariable long userId, @RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         userService.changePassword(userId, changePasswordRequest);

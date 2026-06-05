@@ -23,6 +23,14 @@ databaseChangeLog:
                   name: updated_at
                   type: TIMESTAMP
 
+              - column:
+                  name: created_by
+                  type: varchar(255)
+
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+
               # Payment entity columns
               - column:
                   name: amount

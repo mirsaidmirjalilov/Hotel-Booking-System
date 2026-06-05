@@ -32,7 +32,7 @@ public class HotelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.ok(hotel));
     }
 
-    @PutMapping("/{hotelId}/update")
+    @PutMapping("/{hotelId}")
     public ResponseEntity<BaseResponse<HotelResponse>> updateHotel(@PathVariable Long hotelId,@RequestBody @Valid HotelUpdateRequest hotelRequest) {
         HotelResponse hotelResponse = hotelService.updateHotel(hotelId,hotelRequest);
 

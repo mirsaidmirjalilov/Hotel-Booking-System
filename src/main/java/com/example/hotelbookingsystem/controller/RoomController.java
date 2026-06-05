@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.*;
 public class RoomController {
     private final RoomService roomService;
 
-    @PostMapping("/{hotelId}/create")
+    @PostMapping("/{hotelId}/hotel")
     public ResponseEntity<BaseResponse<RoomResponse>> createRoom(@RequestBody @Valid RoomCreateRequest request, @PathVariable Long hotelId) {
         RoomResponse room = roomService.createRoom(hotelId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.ok(room));
     }
 
-    @PutMapping("/{roomId}/update")
+    @PutMapping("/{roomId}")
     ResponseEntity<BaseResponse<RoomResponse>> updateRoom(@RequestBody @Valid RoomUpdateRequest request, @PathVariable Long roomId) {
         RoomResponse room = roomService.updateRoom(roomId, request);
 
@@ -38,7 +38,7 @@ public class RoomController {
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(room));
     }
 
-    @DeleteMapping("/{managerId}/{roomId}")
+    @DeleteMapping("/{roomId}")
     public void deleteRoom(@PathVariable Long roomId) {
         roomService.deleteRoom(roomId);
     }

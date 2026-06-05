@@ -20,7 +20,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +30,6 @@ public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
     private final RoomMapper roomMapper;
-    private final SecurityUtils securityUtils;
 
     @Override
     @Transactional
