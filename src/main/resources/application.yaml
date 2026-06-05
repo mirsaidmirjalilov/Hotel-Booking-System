@@ -26,6 +26,7 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/changeset/changelog-master.yml
+    default-schema: public
 
   data:
     redis:
