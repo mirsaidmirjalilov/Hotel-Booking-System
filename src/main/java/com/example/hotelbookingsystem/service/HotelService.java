@@ -15,4 +15,5 @@ public interface HotelService {
     Page<HotelResponse> searchHotels(String city, Pageable pageable);
     List<HotelResponse> getMyHotels(Long managerId);
     void deleteHotel(Long hotelId);
+    Page<HotelResponse> getAllHotels(Pageable pageable);
 }

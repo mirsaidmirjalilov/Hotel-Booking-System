@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserService {
     UserResponse createUser(UserCreateRequest createRequest);
 
-    UserResponse getUserProfile(Long userId);
+    UserResponse getUserProfile();
 
     UserResponse updateUser(Long userId, UserUpdateRequest updateRequest);
 

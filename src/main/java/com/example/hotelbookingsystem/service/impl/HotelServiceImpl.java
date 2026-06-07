@@ -97,6 +97,14 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Cacheable(value = "hotels")
+    public Page<HotelResponse> getAllHotels(Pageable pageable) {
+        Page<Hotel> hotelPage = hotelRepository.findAll(pageable);
+
+        return hotelPage.map(hotelMapper::toHotelResponse);
+    }
+
+    @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Transactional
     @CacheEvict(value = {"hotels", "myHotels", "searchHotels"}, allEntries = true)

@@ -8,6 +8,7 @@ import com.example.hotelbookingsystem.payload.user_related.UserCreateRequest;
 import com.example.hotelbookingsystem.payload.user_related.UserResponse;
 import com.example.hotelbookingsystem.payload.user_related.UserUpdateRequest;
 import com.example.hotelbookingsystem.repository.UserRepository;
+import com.example.hotelbookingsystem.security.SecurityUtils;
 import com.example.hotelbookingsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,7 +24,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder bCryptPasswordEncoder;
     private final UserMapper userMapper;
@@ -49,9 +49,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "userProfile", key = "#id")
-    public UserResponse getUserProfile(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    @Cacheable(value = "userProfile",key = "#user.id")
+    public UserResponse getUserProfile() {
+        User user = SecurityUtils.getCurrentUser();
 
         return userMapper.mapToUserResponse(user);
     }

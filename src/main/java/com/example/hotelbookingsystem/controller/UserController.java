@@ -43,9 +43,9 @@ public class UserController {
         userService.enableOrDisableUser(userId, active);
     }
 
-    @GetMapping("/{userId}/profile")
-    public ResponseEntity<BaseResponse<UserResponse>> getUserProfile(@PathVariable long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(userService.getUserProfile(userId)));
+    @GetMapping("/profile")
+    public ResponseEntity<BaseResponse<UserResponse>> getUserProfile() {
+        return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(userService.getUserProfile()));
     }
 
     @PutMapping("/{userId}/profile")

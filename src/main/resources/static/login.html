@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#3b82f6' }
+                }
+            }
+        }
+    </script>
+    <style>
+        .transition-smooth { transition: all 0.2s ease-in-out; }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+        <div class="text-center">
+            <div class="mx-auto h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-sign-in-alt text-3xl text-primary"></i>
+            </div>
+            <h2 class="mt-4 text-3xl font-extrabold text-gray-800">Welcome back</h2>
+            <p class="mt-2 text-sm text-gray-600">Sign in to your account</p>
+        </div>
+
+        <form id="loginForm" class="mt-8 space-y-6">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-gray-400"></i>
+                    </div>
+                    <input type="email" id="email" name="email" required
+                           class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
+                           placeholder="you@example.com">
+                </div>
+                <p class="error-message text-red-500 text-xs mt-1 hidden" data-for="email"></p>
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input type="password" id="password" name="password" required
+                           class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
+                           placeholder="••••••••">
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <i class="fas fa-eye-slash text-gray-400 hover:text-gray-600"></i>
+                    </button>
+                </div>
+                <p class="error-message text-red-500 text-xs mt-1 hidden" data-for="password"></p>
+            </div>
+
+            <div>
+                <button type="submit" id="submitBtn"
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 transform hover:scale-[1.01]">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <i class="fas fa-arrow-right-to-bracket group-hover:translate-x-1 transition-transform"></i>
+                        </span>
+                    Sign in
+                </button>
+                <div id="loadingSpinner" class="hidden mt-3 text-center">
+                    <i class="fas fa-circle-notch fa-spin text-primary text-xl"></i>
+                    <span class="ml-2 text-gray-600">Authenticating...</span>
+                </div>
+            </div>
+
+            <div id="apiMessage" class="rounded-lg p-3 text-sm hidden transition-all"></div>
+
+            <div class="text-center mt-2">
+                <p class="text-sm text-gray-600">
+                    Don't have an account?
+                    <a href="register.html" class="font-medium text-primary hover:text-primary/80 transition">Create one now</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const apiMessageDiv = document.getElementById('apiMessage');
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    function showMessage(message, isError = false) {
+        apiMessageDiv.textContent = message;
+        apiMessageDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+        if (isError) {
+            apiMessageDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-200');
+        } else {
+            apiMessageDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-200');
+        }
+        apiMessageDiv.classList.remove('hidden');
+        if (!isError) {
+            setTimeout(() => apiMessageDiv.classList.add('hidden'), 4000);
+        }
+    }
+
+    function clearFieldErrors() {
+        document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('input').forEach(field => {
+            field.classList.remove('border-red-500');
+            field.classList.add('border-gray-300');
+        });
+    }
+
+    function showFieldError(fieldId, message) {
+        const errorEl = document.querySelector(`.error-message[data-for="${fieldId}"]`);
+        const inputEl = document.getElementById(fieldId);
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+        if (inputEl) {
+            inputEl.classList.remove('border-gray-300');
+            inputEl.classList.add('border-red-500');
+        }
+    }
+
+    togglePassword.addEventListener('click', () => {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        togglePassword.querySelector('i').classList.toggle('fa-eye');
+        togglePassword.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearFieldErrors();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        let isValid = true;
+        if (!email) {
+            showFieldError('email', 'Email is required');
+            isValid = false;
+        } else if (!/^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(email)) {
+            showFieldError('email', 'Valid email required');
+            isValid = false;
+        }
+
+        if (!password) {
+            showFieldError('password', 'Password is required');
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        const payload = { email, password };
+
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+        loadingSpinner.classList.remove('hidden');
+        apiMessageDiv.classList.add('hidden');
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Extract token from AuthResponse (field name: token)
+                const token = data.token;
+                if (token) {
+                    localStorage.setItem('authToken', token);
+                    // Store user info if present
+                    if (data.user) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                    }
+                }
+                showMessage('✅ Login successful! Redirecting...', false);
+                setTimeout(() => {
+                    window.location.href = '/index.html';
+                }, 1500);
+            } else {
+                const errorMsg = data.message || data.error || 'Invalid email or password';
+                showMessage(`❌ ${errorMsg}`, true);
+                document.getElementById('password').value = '';
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            showMessage('⚠️ Network error. Could not connect to server.', true);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            loadingSpinner.classList.add('hidden');
+        }
+    });
+</script>
+</body>
+</html>

@@ -33,8 +33,8 @@ public class HotelController {
     }
 
     @PutMapping("/{hotelId}")
-    public ResponseEntity<BaseResponse<HotelResponse>> updateHotel(@PathVariable Long hotelId,@RequestBody @Valid HotelUpdateRequest hotelRequest) {
-        HotelResponse hotelResponse = hotelService.updateHotel(hotelId,hotelRequest);
+    public ResponseEntity<BaseResponse<HotelResponse>> updateHotel(@PathVariable Long hotelId, @RequestBody @Valid HotelUpdateRequest hotelRequest) {
+        HotelResponse hotelResponse = hotelService.updateHotel(hotelId, hotelRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(hotelResponse));
     }
@@ -47,10 +47,17 @@ public class HotelController {
     }
 
     @GetMapping("/{managerId}")
-    public ResponseEntity<BaseResponse<List<HotelResponse>>> getAllHotels(@PathVariable Long managerId) {
+    public ResponseEntity<BaseResponse<List<HotelResponse>>> getManagerHotels(@PathVariable Long managerId) {
         List<HotelResponse> myHotels = hotelService.getMyHotels(managerId);
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(myHotels));
+    }
+
+    @GetMapping
+    public ResponseEntity<BaseResponse<Page<HotelResponse>>> getAllHotels(@PageableDefault Pageable pageable) {
+        Page<HotelResponse> allHotels = hotelService.getAllHotels(pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ok(allHotels));
     }
 
     @DeleteMapping("/{hotelId}")

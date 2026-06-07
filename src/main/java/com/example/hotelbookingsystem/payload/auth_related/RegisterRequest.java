@@ -22,5 +22,4 @@ public record RegisterRequest(
 
         Role role
 ) {
-
 }

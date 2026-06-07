@@ -5,7 +5,6 @@ import com.example.hotelbookingsystem.exception.CustomAuthenticationEntryPoint;
 import com.example.hotelbookingsystem.security.JwtTokenFilter;
 import com.example.hotelbookingsystem.security.JwtTokenUtil;
 import com.example.hotelbookingsystem.security.userdetails.CustomUserDetailsService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -38,17 +36,25 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final JwtTokenUtil jwtTokenUtil;
     private final CustomUserDetailsService userDetailsService;
-    @Getter
-    private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()
-                        )
-                )
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Public endpoints and pages
+                        .requestMatchers("/",
+                                "/login.html",
+                                "/register.html",
+                                "/profile.html",
+                                "/index.html",
+                                "/main.html",
+                                "/dashboard.html",
+                                "/css/**",
+                                "/js/**"
+                        ).permitAll()
+
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/v3/api-docs.yaml",
@@ -57,19 +63,10 @@ public class SecurityConfig {
                                 "/swagger-resources/**"
                         ).permitAll()
 
-                        // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/v1/hotels/**").permitAll()     // Allow browsing hotels
+                        .requestMatchers("/api/v1/hotels/**").permitAll()
                         .requestMatchers("/api/v1/rooms/**").permitAll()
                         .requestMatchers("/api/v1/reviews/**").permitAll()
-
-                        // Protected endpoints
-                        .requestMatchers("/api/v1/bookings/**").authenticated()
-                        .requestMatchers("/api/v1/payments/**").authenticated()
-                        .requestMatchers("/api/v1/users/**").authenticated()
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-
-                        .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
                 .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer
@@ -105,14 +102,12 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:8080",      // For static frontend
-                "http://127.0.0.1:8080",
-                "http://localhost:5173"       // If you're also using Vite dev server
+                "http://localhost:8080"      // For static frontend
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);   // Important for JWT + cookies if used
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

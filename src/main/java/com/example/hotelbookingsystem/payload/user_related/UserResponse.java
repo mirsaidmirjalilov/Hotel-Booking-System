@@ -9,6 +9,7 @@ public record UserResponse(
         String email,
         String fullName,
         Role role,
+        String phoneNumber,
         LocalDateTime createdAt
 ) {
 }
