@@ -58,7 +58,7 @@ Hotel-Booking-System/
 
 - Java 21 (JDK)
 - Maven 3.8+
-- Docker & Docker Compose (optional)
+- Docker & Docker Compose
 
 ### Local Setup (without Docker)
 
