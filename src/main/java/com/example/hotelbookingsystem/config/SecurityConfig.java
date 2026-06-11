@@ -45,12 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints and pages
                         .requestMatchers("/",
-                                "/login.html",
-                                "/register.html",
-                                "/profile.html",
                                 "/index.html",
-                                "/main.html",
-                                "/dashboard.html",
                                 "/css/**",
                                 "/js/**"
                         ).permitAll()
